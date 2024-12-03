@@ -1,0 +1,1 @@
+''' Das wird das Programm für die Einkaufsanalyse für die Frima Taurus Sports AG'''
