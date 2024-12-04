@@ -1,6 +1,6 @@
 # Beispiel
 
-pandas==1.5.3
-streamlit==1.26.0
-matplotlib==3.7.2
-numpy==1.25.0
+pandas
+streamlit
+matplotlib
+numpy
