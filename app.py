@@ -16,6 +16,14 @@ import openpyxl
 from openpyxl.styles import Alignment, Font, PatternFill, NamedStyle
 from openpyxl.utils import get_column_letter
 
+
+def normalize_column_name(col):
+    if pd.isna(col):
+        return ""
+    if isinstance(col, float) and col.is_integer():
+        return str(int(col))
+    return str(col).strip()
+
 # Set the theme to a dark mode
 st.markdown(
     """
@@ -50,6 +58,7 @@ if uploaded_file:
     try:
         # Read Excel file into DataFrame
         df = pd.read_excel(uploaded_file, engine='openpyxl')
+        df.columns = [normalize_column_name(col) for col in df.columns]
 
         # Define fixed columns
         fixed_columns = ["Bestand", "Artikelname", "Artikelgruppe", "KatalogNr", "Artikel", "Kollektion", "Netto"]
@@ -117,7 +126,7 @@ if uploaded_file:
                 for col_num, col_name in enumerate(filtered_df.columns, 1):
                     col_letter = get_column_letter(col_num)
                     worksheet.column_dimensions[col_letter].width = max(
-                        15, max(filtered_df[col_name].astype(str).map(len).max(), len(col_name)) + 2
+                        15, max(filtered_df[col_name].astype(str).map(len).max(), len(str(col_name))) + 2
                     )
                     for row in range(2, worksheet.max_row + 1):
                         cell = worksheet.cell(row=row, column=col_num)
@@ -125,7 +134,7 @@ if uploaded_file:
                         if col_name == "Netto":
                             # Format "Netto" column with thousands separator and two decimals
                             cell.number_format = "#,##0.00"
-                            if cell.value < 0:  # Negative values in red
+                            if isinstance(cell.value, (int, float)) and cell.value < 0:  # Negative values in red
                                 cell.font = Font(color="FF0000")
                         elif col_name in ["Bestand", "KatalogNr"]:
                             # Left align "Bestand" and "KatalogNr"
